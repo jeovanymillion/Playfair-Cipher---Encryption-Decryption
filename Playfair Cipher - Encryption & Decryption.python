@@ -1,0 +1,33 @@
+def generate_playfair_matrix(keyword):
+    keyword = ''.join(dict.fromkeys(keyword.replace('j', 'i')))
+    alphabet = ''.join(ch for ch in string.ascii_lowercase if ch not in keyword and ch != 'j')
+    matrix = keyword + alphabet
+    return [list(matrix[i:i + 5]) for i in range(0, 25, 5)]
+
+
+def playfair_encrypt_decrypt(text, matrix, mode='encrypt'):
+    def find_position(letter):
+        for r, row in enumerate(matrix):
+            if letter in row:
+                return r, row.index(letter)
+
+    text = text.replace('j', 'i')
+    pairs = [(text[i], text[i + 1]) for i in range(0, len(text), 2)]
+    result = ''
+
+    for a, b in pairs:
+        row1, col1 = find_position(a)
+        row2, col2 = find_position(b)
+
+        if row1 == row2:
+            col1 = (col1 + 1) % 5 if mode == 'encrypt' else (col1 - 1) % 5
+            col2 = (col2 + 1) % 5 if mode == 'encrypt' else (col2 - 1) % 5
+        elif col1 == col2:
+            row1 = (row1 + 1) % 5 if mode == 'encrypt' else (row1 - 1) % 5
+            row2 = (row2 + 1) % 5 if mode == 'encrypt' else (row2 - 1) % 5
+        else:
+            col1, col2 = col2, col1
+
+        result += matrix[row1][col1] + matrix[row2][col2]
+
+    return result
